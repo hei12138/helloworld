@@ -73,8 +73,20 @@ for i in range(10):
         experience_info = extInfo[0].contents[2]
         # 从额外相关信息中找到学历要求
         graduate_info = extInfo[0].contents[4]
+        # 找到职位详情相关信息
+        info_primary = k.find_all('div', class_='info-primary')
+        # 从职位详情相关信息中获取职位详情属性
+        job_detail_info = info_primary[0].find_all('a')
+        data_jid = job_detail_info[0]['data-jid']
+        data_lid = job_detail_info[0]['data-lid']
+        # 拼接出获取职位详情的url
+        detail_url = 'https://www.zhipin.com/wapi/zpgeek/view/job/card.json?jid=' + data_jid + '&lid=' + data_lid
+        # 获取职位详情的网页内容
+        detail_html = requests.get(detail_url, headers=headers, cookies=cookies)
+        detail_soup = BeautifulSoup(detail_html.text, "lxml")
+
         # 找到职位描述
-        jobdescription = k.find_all('div', class_='detail-bottom-text')
+        jobdescription = detail_soup.find_all('div', class_='\\"detail-bottom-text\\"')
 
         table.write(current_row_num, 0, title[0].text)
         table.write(current_row_num, 1, money[0].text)
@@ -85,7 +97,7 @@ for i in range(10):
         table.write(current_row_num, 6, companyPeopleClass)
         table.write(current_row_num, 7, companyPeopleFin)
         table.write(current_row_num, 8, companyPeopleScale)
-        table.write(current_row_num, 9, jobdescription)
+        table.write(current_row_num, 9, jobdescription[0].text)
         current_row_num += 1
 # 保存文件为data.xls
 file.save('bossdata2.xls')
