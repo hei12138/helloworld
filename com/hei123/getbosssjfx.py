@@ -1,7 +1,7 @@
-from bs4 import BeautifulSoup # bs4是一个网页解析的框架，BeautifulSoup是其中一个类;使用pip install bs4进行下载
-from lxml import html # lxml是一个网页解析的包，html是其中一个类；使用pip install lxml进行下载
-import requests # python自带的requests类，用于访问网站； 使用pip install requests进行下载
-from xlwt import * # xlwt是用来生成与微软Excel版本95到2003兼容的电子表格文件的库,使用pip install xlwt进行下载
+from bs4 import BeautifulSoup  # bs4是一个网页解析的框架，BeautifulSoup是其中一个类;使用pip install bs4进行下载
+from lxml import html  # lxml是一个网页解析的包，html是其中一个类；使用pip install lxml进行下载
+import requests  # python自带的requests类，用于访问网站； 使用pip install requests进行下载
+from xlwt import *  # xlwt是用来生成与微软Excel版本95到2003兼容的电子表格文件的库,使用pip install xlwt进行下载
 
 headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
@@ -13,7 +13,7 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'
 }
 cookies = {
-    'Cookie': 'lastCity=101280600; _uab_collina=156213596289177283908984; sid=sem_pz_bdpc_dasou_title; Hm_lvt_194df3105ad7148dcf2b98a91b5e727a=1562135963,1562641736; __c=1562641736; __g=sem_pz_bdpc_dasou_title; __l=l=%2Fwww.zhipin.com%2F%3Fsid%3Dsem_pz_bdpc_dasou_title&r=&g=%2Fwww.zhipin.com%2F%3Fsid%3Dsem_pz_bdpc_dasou_title; __a=53721451.1562135963.1562135963.1562641736.35.2.3.3; Hm_lpvt_194df3105ad7148dcf2b98a91b5e727a=1562641749'}
+    'Cookie': 'lastCity=101280600; _uab_collina=156213596289177283908984; sid=sem_pz_bdpc_dasou_title; Hm_lvt_194df3105ad7148dcf2b98a91b5e727a=1562135963,1562641736; __c=1562641736; __g=sem_pz_bdpc_dasou_title; __l=l=%2Fwww.zhipin.com%2F%3Fsid%3Dsem_pz_bdpc_dasou_title&r=&g=%2Fwww.zhipin.com%2F%3Fsid%3Dsem_pz_bdpc_dasou_title; __a=53721451.1562135963.1562135963.1562641736.44.2.12.12; Hm_lpvt_194df3105ad7148dcf2b98a91b5e727a=1562738109'}
 # 新建一个excel文件放在内存中
 file = Workbook(encoding='utf-8')
 # 给excel文件添加一个sheet页 cell_overwrite_ok设置为false表示禁止重复写入数据
@@ -46,12 +46,23 @@ for i in range(10):
         companyName = companyInfo[0].find_all("h3")
         # 从公司相关信息中找到公司分类、是否上市、规模
         companyExtraInfo = companyInfo[0].find_all("p")
-        # 从公司相关信息中找到公司分类
-        companyPeopleClass = companyExtraInfo[0].contents[0]
-        # 从公司相关信息中找到融资情况
-        companyPeopleFin = companyExtraInfo[0].contents[2]
-        # 从公司相关信息中找到公司规模
-        companyPeopleScale = companyExtraInfo[0].contents[4]
+        companyExtraInfoLength = len(companyExtraInfo[0].contents)
+        companyPeopleClass=""
+        companyPeopleFin=""
+        companyPeopleScale=""
+        #
+        if companyExtraInfoLength==5:
+            companyPeopleClass = companyExtraInfo[0].contents[0]
+            # 从公司相关信息中找到融资情况
+            companyPeopleFin = companyExtraInfo[0].contents[2]
+            # 从公司相关信息中找到公司规模
+            companyPeopleScale = companyExtraInfo[0].contents[4]
+        else:
+            companyPeopleClass = companyExtraInfo[0].contents[0]
+            # 从公司相关信息中找到融资情况
+            companyPeopleFin = "没有融资情况"
+            # 从公司相关信息中找到公司规模
+            companyPeopleScale = companyExtraInfo[0].contents[2]
         # 找到薪资
         money = k.find_all('span', class_='red')
         # 找到额外相关信息
@@ -63,7 +74,7 @@ for i in range(10):
         # 从额外相关信息中找到学历要求
         graduate_info = extInfo[0].contents[4]
         # 找到职位描述
-        jobdescription= k.find_all('div', class_='detail-bottom-text')
+        jobdescription = k.find_all('div', class_='detail-bottom-text')
 
         table.write(current_row_num, 0, title[0].text)
         table.write(current_row_num, 1, money[0].text)
@@ -71,10 +82,10 @@ for i in range(10):
         table.write(current_row_num, 3, address)
         table.write(current_row_num, 4, experience_info)
         table.write(current_row_num, 5, graduate_info)
-        table.write(current_row_num, 6, companyPeopleClass[0].text)
-        table.write(current_row_num, 7, companyPeopleFin[0].text)
-        table.write(current_row_num, 8, companyPeopleScale[0].text)
-        table.write(current_row_num, 9, jobdescription[0].text)
+        table.write(current_row_num, 6, companyPeopleClass)
+        table.write(current_row_num, 7, companyPeopleFin)
+        table.write(current_row_num, 8, companyPeopleScale)
+        table.write(current_row_num, 9, jobdescription)
         current_row_num += 1
 # 保存文件为data.xls
 file.save('bossdata2.xls')
