@@ -1,7 +1,7 @@
-from bs4 import BeautifulSoup
-from lxml import html
-import requests
-from xlwt import *
+from bs4 import BeautifulSoup # bs4是一个网页解析的框架，BeautifulSoup是其中一个类;使用pip install bs4进行下载
+from lxml import html # lxml是一个网页解析的包，html是其中一个类；使用pip install lxml进行下载
+import requests # python自带的requests类，用于访问网站； 使用pip install requests进行下载
+from xlwt import * # xlwt是用来生成与微软Excel版本95到2003兼容的电子表格文件的库,使用pip install xlwt进行下载
 
 headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
@@ -21,10 +21,14 @@ table = file.add_sheet('data', cell_overwrite_ok=False)
 # table.write(row_num,col_num,value) 写入数据，往第row_num行，第col_num列写入数据value
 table.write(0, 0, u'岗位名称')
 table.write(0, 1, u'岗位薪资')
-table.write(0, 2, u'公司信息')
-table.write(0, 3, u'地址')
+table.write(0, 2, u'公司名称')
+table.write(0, 3, u'工作地址')
 table.write(0, 4, u'经验要求')
 table.write(0, 5, u'学历要求')
+table.write(0, 6, u'公司分类')
+table.write(0, 7, u'融资情况')
+table.write(0, 8, u'公司规模')
+table.write(0, 9, u'职位描述')
 
 current_row_num = 1  # 写入excel的位置，每次循环后都会加1，方便确认写入excel的哪一行
 
@@ -34,17 +38,20 @@ for i in range(10):
     soup = BeautifulSoup(f.text, "lxml")  # 用lxml解析器解析该网页的内容, 好像f.text也是返回的html
     find_all = soup.find_all('div', class_='job-primary')  # 找到div并且class为pl2的标签
     for k in find_all:
+        # 找到岗位名称
+        title = k.find_all('div', class_='job-title')  # 在每个对应div标签下找span标签，会发现，一个a里面有四组span
         # 找到公司相关信息
         companyInfo = k.find_all('div', class_='info-company')
         # 从公司相关信息中找到公司名称
         companyName = companyInfo[0].find_all("h3")
-        # 从公司相关信息中找到公司人数
+        # 从公司相关信息中找到公司分类、是否上市、规模
         companyExtraInfo = companyInfo[0].find_all("p")
-        companyClass = companyExtraInfo[0].contents[0]
-        companyClass1 = companyExtraInfo[0].contents[2]
-        companyClass2 = companyExtraInfo[0].contents[4]
-        # 找到岗位名称
-        title = k.find_all('div', class_='job-title')  # 在每个对应div标签下找span标签，会发现，一个a里面有四组span
+        # 从公司相关信息中找到公司分类
+        companyPeopleClass = companyExtraInfo[0].contents[0]
+        # 从公司相关信息中找到融资情况
+        companyPeopleFin = companyExtraInfo[0].contents[2]
+        # 从公司相关信息中找到公司规模
+        companyPeopleScale = companyExtraInfo[0].contents[4]
         # 找到薪资
         money = k.find_all('span', class_='red')
         # 找到额外相关信息
@@ -55,12 +62,19 @@ for i in range(10):
         experience_info = extInfo[0].contents[2]
         # 从额外相关信息中找到学历要求
         graduate_info = extInfo[0].contents[4]
+        # 找到职位描述
+        jobdescription= k.find_all('div', class_='detail-bottom-text')
+
         table.write(current_row_num, 0, title[0].text)
         table.write(current_row_num, 1, money[0].text)
         table.write(current_row_num, 2, companyName[0].text)
         table.write(current_row_num, 3, address)
         table.write(current_row_num, 4, experience_info)
         table.write(current_row_num, 5, graduate_info)
+        table.write(current_row_num, 6, companyPeopleClass[0].text)
+        table.write(current_row_num, 7, companyPeopleFin[0].text)
+        table.write(current_row_num, 8, companyPeopleScale[0].text)
+        table.write(current_row_num, 9, jobdescription[0].text)
         current_row_num += 1
 # 保存文件为data.xls
-file.save('data.xls')
+file.save('bossdata2.xls')
