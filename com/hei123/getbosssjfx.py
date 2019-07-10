@@ -50,7 +50,7 @@ for i in range(10):
         companyPeopleClass = ""
         companyPeopleFin = ""
         companyPeopleScale = ""
-        #
+        # 根据公司附属信息list的长度进行判断 如果长度为5，则具有全部属性，如果长度为3 说明缺少了融资情况
         if companyExtraInfoLength == 5:
             companyPeopleClass = companyExtraInfo[0].contents[0]
             # 从公司相关信息中找到融资情况
