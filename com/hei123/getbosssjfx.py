@@ -47,11 +47,11 @@ for i in range(10):
         # 从公司相关信息中找到公司分类、是否上市、规模
         companyExtraInfo = companyInfo[0].find_all("p")
         companyExtraInfoLength = len(companyExtraInfo[0].contents)
-        companyPeopleClass=""
-        companyPeopleFin=""
-        companyPeopleScale=""
+        companyPeopleClass = ""
+        companyPeopleFin = ""
+        companyPeopleScale = ""
         #
-        if companyExtraInfoLength==5:
+        if companyExtraInfoLength == 5:
             companyPeopleClass = companyExtraInfo[0].contents[0]
             # 从公司相关信息中找到融资情况
             companyPeopleFin = companyExtraInfo[0].contents[2]
